@@ -26,6 +26,26 @@ namespace LiveSplit.Terraria {
             { EBosses.SkeletronPrime.ToString(), "skeletron_prime" },
         };
 
+        private static Dictionary<string, bool> bossesDefeated = new Dictionary<string, bool> {
+            { "WallofFlesh", false },
+            { EBosses.EyeofCthulhu.ToString(), false },
+            { EBosses.EaterofWorldsBrainofCthulhu.ToString(), false },
+            { EBosses.Skeletron.ToString(), false },
+            { EBosses.QueenBee.ToString(), false },
+            { EBosses.KingSlime.ToString(), false },
+            { EBosses.Plantera.ToString(), false },
+            { EBosses.Golem.ToString(), false },
+            { EBosses.DukeFishron.ToString(), false },
+            { EBosses.LunaticCultist.ToString(), false },
+            { EBosses.MoonLord.ToString(), false },
+            { EBosses.EmpressofLight.ToString(), false },
+            { EBosses.QueenSlime.ToString(), false },
+            { EBosses.TheDestroyer.ToString(), false },
+            { EBosses.TheTwins.ToString(), false },
+            { EBosses.SkeletronPrime.ToString(), false },
+            { EBosses.Deerclops.ToString(), false },
+        };
+
         private const string SiteURL = "https://dryoshiyahu.github.io/terraria-boss-checklist/";
 
         private bool isRunning = false;
@@ -82,6 +102,14 @@ namespace LiveSplit.Terraria {
         public void SetRunning(bool value) {
             isRunning = value;
             WebBrowser.Document.InvokeScript("resetBosses");
+
+            // https://stackoverflow.com/questions/1070766/editing-dictionary-values-in-a-foreach-loop?rq=1
+            List<string> bosses = new List<string>(bossesDefeated.Keys);
+            for(int i = 0; i < bosses.Count; i++) {
+                bossesDefeated[bosses[i]] = false;
+            }
+            UpdatebossesDefeatedFile();
+
             bossOffsets = new HashSet<int>(TerrariaEnums.AllBosses.Cast<int>());
             isHardmode = false;
         }
@@ -91,16 +119,40 @@ namespace LiveSplit.Terraria {
                 return;
             }
 
+            var bossesDefeatedChanged = false;
+
             foreach(int offset in bossOffsets.ToArray()) {
                 if(memory.IsBossBeaten(offset)) {
                     bossOffsets.Remove(offset);
                     CheckBoss(TerrariaEnums.BossName(offset));
+                    if (bossesDefeated[TerrariaEnums.BossName(offset)] == false) {
+                        bossesDefeated[TerrariaEnums.BossName(offset)] = true;
+                        bossesDefeatedChanged = true;
+                    }
+
                 }
             }
 
             if(!isHardmode && memory.IsHardmode.New) {
                 isHardmode = true;
                 CheckBoss("WallofFlesh");
+                if(bossesDefeated["WallofFlesh"] == false) {
+                    bossesDefeated["WallofFlesh"] = true;
+                    bossesDefeatedChanged = true;
+                }
+            }
+
+            if(bossesDefeatedChanged) {
+                UpdatebossesDefeatedFile();
+            }
+        }
+
+        public void UpdatebossesDefeatedFile() {
+            using(StreamWriter file = new StreamWriter(@"_bosses-defeated.csv")) {
+                foreach(var entry in bossesDefeated) {
+                    file.WriteLine("{0},{1}", entry.Key, entry.Value);
+                }
+                file.Close();
             }
         }
 

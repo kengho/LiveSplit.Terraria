@@ -109,7 +109,7 @@ namespace LiveSplit.Terraria {
             for(int i = 0; i < bosses.Count; i++) {
                 bossesDefeated[bosses[i]] = false;
             }
-            UpdatebossesDefeatedFile();
+            UpdateBossesDefeatedFile();
 
             bossOffsets = new HashSet<int>(TerrariaEnums.AllBosses.Cast<int>());
             isHardmode = false;
@@ -144,11 +144,11 @@ namespace LiveSplit.Terraria {
             }
 
             if(bossesDefeatedChanged) {
-                UpdatebossesDefeatedFile();
+                UpdateBossesDefeatedFile();
             }
         }
 
-        public void UpdatebossesDefeatedFile() {
+        public void UpdateBossesDefeatedFile() {
             using(StreamWriter file = new StreamWriter(@"_bosses-defeated.csv")) {
                 foreach(var entry in bossesDefeated) {
                     file.WriteLine("{0},{1}", entry.Key, entry.Value);

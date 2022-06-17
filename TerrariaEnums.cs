@@ -13,7 +13,7 @@ namespace LiveSplit.Terraria {
                 List<EBosses> bosses = new List<EBosses>();
                 foreach(EBosses boss in Enum.GetValues(typeof(EBosses))) {
                     string name = boss.ToString();
-                    if(!name.StartsWith("_") && !name.EndsWith("Pillar")) {
+                    if(!name.StartsWith("_")/* && !name.EndsWith("Pillar")*/) {
                         bosses.Add(boss);
                     }
                 }

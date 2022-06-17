@@ -27,7 +27,7 @@ namespace LiveSplit.Terraria {
             { EBosses.SkeletronPrime.ToString(), "skeletron_prime" },
         };
 
-        private static Dictionary<string, bool> bossesDefeated = new Dictionary<string, bool> {
+        private static Dictionary<string, bool> BossesDefeated = new Dictionary<string, bool> {
             { "WallofFlesh", false },
             { EBosses.EyeofCthulhu.ToString(), false },
             { EBosses.EaterofWorldsBrainofCthulhu.ToString(), false },
@@ -45,6 +45,7 @@ namespace LiveSplit.Terraria {
             { EBosses.TheTwins.ToString(), false },
             { EBosses.SkeletronPrime.ToString(), false },
             { EBosses.Deerclops.ToString(), false },
+            { EBosses.NebulaPillar.ToString(), false },
         };
 
         private const string SiteURL = "https://dryoshiyahu.github.io/terraria-boss-checklist/";
@@ -105,9 +106,9 @@ namespace LiveSplit.Terraria {
             WebBrowser.Document.InvokeScript("resetBosses");
 
             // https://stackoverflow.com/questions/1070766/editing-dictionary-values-in-a-foreach-loop?rq=1
-            List<string> bosses = new List<string>(bossesDefeated.Keys);
+            List<string> bosses = new List<string>(BossesDefeated.Keys);
             for(int i = 0; i < bosses.Count; i++) {
-                bossesDefeated[bosses[i]] = false;
+                BossesDefeated[bosses[i]] = false;
             }
             UpdateBossesDefeatedFile();
 
@@ -126,8 +127,8 @@ namespace LiveSplit.Terraria {
                 if(memory.IsBossBeaten(offset)) {
                     bossOffsets.Remove(offset);
                     CheckBoss(TerrariaEnums.BossName(offset));
-                    if (bossesDefeated[TerrariaEnums.BossName(offset)] == false) {
-                        bossesDefeated[TerrariaEnums.BossName(offset)] = true;
+                    if (BossesDefeated[TerrariaEnums.BossName(offset)] == false) {
+                        BossesDefeated[TerrariaEnums.BossName(offset)] = true;
                         bossesDefeatedChanged = true;
                     }
 
@@ -137,8 +138,8 @@ namespace LiveSplit.Terraria {
             if(!isHardmode && (memory.IsHardmode?.New ?? false)) {
                 isHardmode = true;
                 CheckBoss("WallofFlesh");
-                if(bossesDefeated["WallofFlesh"] == false) {
-                    bossesDefeated["WallofFlesh"] = true;
+                if(BossesDefeated["WallofFlesh"] == false) {
+                    BossesDefeated["WallofFlesh"] = true;
                     bossesDefeatedChanged = true;
                 }
             }
@@ -150,7 +151,7 @@ namespace LiveSplit.Terraria {
 
         public void UpdateBossesDefeatedFile() {
             using(StreamWriter file = new StreamWriter(@"_bosses-defeated.csv")) {
-                foreach(var entry in bossesDefeated) {
+                foreach(var entry in BossesDefeated) {
                     file.WriteLine("{0},{1}", entry.Key, entry.Value);
                 }
                 file.Close();
